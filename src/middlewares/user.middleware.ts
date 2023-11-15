@@ -1,22 +1,28 @@
 import { NextFunction, Request, Response } from 'express';
 
 import { ApiError } from '../errors';
-import { UserValidator } from '../validators';
+import { User } from '../models';
 
 class UserMiddleware {
-  public isCreateValid(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { error, value } = UserValidator.create.validate(req.body);
+  public isUserExist<T>(field: keyof T) {
+    return async (
+      req: Request,
+      _res: Response,
+      next: NextFunction,
+    ): Promise<void> => {
+      try {
+        const user = await User.findOne({ [field]: req.body[field] });
 
-      if (error) {
-        throw new ApiError(error.message, 400);
+        if (!user) {
+          throw new ApiError('User not found', 422);
+        }
+
+        req.res.locals.user = user;
+        next();
+      } catch (e) {
+        next(new ApiError(e.message, e.status));
       }
-
-      req.res.locals = value;
-      next();
-    } catch (e) {
-      next(new ApiError(e.message, e.status));
-    }
+    };
   }
 }
 

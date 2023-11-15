@@ -3,11 +3,10 @@ import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '../errors';
 import { userService } from '../services';
 import { IUser } from '../types';
-import { UserValidator } from '../validators';
 
 class UserController {
   public async findAll(
-    req: Request,
+    _req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<Response<IUser[]>> {
@@ -15,21 +14,7 @@ class UserController {
       const users = await userService.findAll();
       return res.json(users);
     } catch (e) {
-      next(e);
-    }
-  }
-
-  public async create(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<Response<IUser>> {
-    try {
-      const createUser = await userService.create(req.res.locals as IUser);
-
-      return res.status(201).json(createUser);
-    } catch (e) {
-      next(e);
+      next(new ApiError(e.message, e.status));
     }
   }
 
@@ -43,7 +28,7 @@ class UserController {
 
       return res.status(200).json(userById);
     } catch (e) {
-      next(e);
+      next(new ApiError(e.message, e.status));
     }
   }
 
@@ -53,17 +38,14 @@ class UserController {
     next: NextFunction,
   ): Promise<Response<IUser>> {
     try {
-      const { error, value } = UserValidator.update.validate(req.body);
+      const { userId } = req.params;
+      const user = req.body;
 
-      if (error) {
-        throw new ApiError(error.message, 400);
-      }
-
-      const updateUser = await userService.update(req.params.userId, value);
+      const updateUser = await userService.update(userId, user);
 
       return res.status(201).json(updateUser);
     } catch (e) {
-      next(e);
+      next(new ApiError(e.message, e.status));
     }
   }
 
@@ -77,7 +59,7 @@ class UserController {
 
       return res.sendStatus(204);
     } catch (e) {
-      next(e);
+      next(new ApiError(e.message, e.status));
     }
   }
 }
