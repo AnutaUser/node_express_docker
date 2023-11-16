@@ -10,13 +10,14 @@ const router = Router();
 router.post(
   '/register',
   commonMiddleware.isBodyValid(UserValidator.create),
+  userMiddleware.findAndThrow('email'),
   authController.register,
 );
 
 router.post(
   '/login',
-  userMiddleware.isUserExist<ICredential>('email'),
   commonMiddleware.isBodyValid(UserValidator.login),
+  userMiddleware.isUserExist<ICredential>('email'),
   authController.login,
 );
 
