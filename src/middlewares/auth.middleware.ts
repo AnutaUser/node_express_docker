@@ -31,6 +31,7 @@ class AuthMiddleware {
 
       req.res.locals.tokenPayload = tokenPayload;
       req.res.locals.entity = entity;
+
       next();
     } catch (e) {
       next(new ApiError(e.message, e.status));
@@ -62,6 +63,8 @@ class AuthMiddleware {
 
       req.res.locals.tokenPayload = tokenPayload;
       req.res.locals.oldTokensPair = entity;
+
+      next();
     } catch (e) {
       next(new ApiError(e.message, e.status));
     }

@@ -8,7 +8,7 @@ class UserMiddleware {
   public findAndThrow(field: keyof IUser) {
     return async (
       req: Request,
-      res: Response,
+      _res: Response,
       next: NextFunction,
     ): Promise<void> => {
       try {
@@ -20,6 +20,8 @@ class UserMiddleware {
             409,
           );
         }
+
+        next();
       } catch (e) {
         next(new ApiError(e.message, e.status));
       }
