@@ -7,3 +7,7 @@ export interface ITokenPair {
 
 export type ITokenPayload = Pick<IUser, 'username' | '_id'>;
 export type ICredential = Pick<IUser, 'email' | 'password'>;
+
+export interface IActionToken {
+  actionToken: string;
+}

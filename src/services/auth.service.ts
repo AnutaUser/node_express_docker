@@ -1,22 +1,38 @@
-import { EEmailActions } from '../enums';
+import { Types } from 'mongoose';
+
+import { EActionTokenType, EEmailActions, EStatus } from '../enums';
 import { ApiError } from '../errors';
-import { OldPassword, Token, User } from '../models';
+import { Action, OldPassword, Token, User } from '../models';
 import { ICredential, ITokenPair, ITokenPayload, IUser } from '../types';
 import { emailService } from './email.service';
 import { passwordService } from './password.service';
 import { tokenService } from './token.service';
 
 class AuthService {
-  public async register(user: IUser) {
+  public async register(body: IUser): Promise<void> {
     try {
-      const { password, email, username } = user;
+      const { password, email, username } = body;
 
       const hashedPassword = await passwordService.hash(password);
 
-      await Promise.all([
-        User.create({ ...user, password: hashedPassword }),
+      const user = await User.create({ ...body, password: hashedPassword });
 
-        emailService.sendMail(email, EEmailActions.REGISTER, { username }),
+      const activateToken = await tokenService.generateActionToken(
+        { _id: user._id },
+        EActionTokenType.Activate,
+      );
+
+      await Promise.all([
+        Action.create({
+          actionToken: activateToken,
+          actionType: EActionTokenType.Activate,
+          _user: user._id,
+        }),
+
+        emailService.sendMail(email, EEmailActions.REGISTER, {
+          username,
+          activateToken,
+        }),
       ]);
     } catch (e) {
       throw new ApiError(e.message, e.status);
@@ -43,6 +59,29 @@ class AuthService {
 
       await Token.create({ ...tokenPair, _user: user._id });
       return tokenPair;
+    } catch (e) {
+      throw new ApiError(e.message, e.status);
+    }
+  }
+
+  public async refresh(
+    oldTokensPair: ITokenPair,
+    tokenPayload: ITokenPayload,
+  ): Promise<ITokenPair> {
+    try {
+      const { _id, username } = tokenPayload;
+
+      const tokensPair = await tokenService.generateTokensPair({
+        _id,
+        username,
+      });
+
+      await Promise.all([
+        Token.create({ ...tokensPair, _user: _id }),
+        Token.deleteOne({ refreshToken: oldTokensPair.refreshToken }),
+      ]);
+
+      return tokensPair;
     } catch (e) {
       throw new ApiError(e.message, e.status);
     }
@@ -90,24 +129,73 @@ class AuthService {
     }
   }
 
-  public async refresh(
-    oldTokensPair: ITokenPair,
-    tokenPayload: ITokenPayload,
-  ): Promise<ITokenPair> {
+  public async forgotPassword(
+    email: string,
+    _id: string,
+    username: string,
+  ): Promise<void> {
     try {
-      const { _id, username } = tokenPayload;
-
-      const tokensPair = await tokenService.generateTokensPair({
-        _id,
-        username,
-      });
+      const forgotPasswordToken = await tokenService.generateActionToken(
+        { _id },
+        EActionTokenType.Forgot,
+      );
 
       await Promise.all([
-        Token.create({ ...tokensPair, _user: _id }),
-        Token.deleteOne({ refreshToken: oldTokensPair.refreshToken }),
-      ]);
+        Action.create({
+          actionToken: forgotPasswordToken,
+          actionType: EActionTokenType.Forgot,
+          _user: _id,
+        }),
 
-      return tokensPair;
+        emailService.sendMail(email, EEmailActions.FORGOT_PASSWORD, {
+          forgotPasswordToken,
+          username,
+        }),
+      ]);
+    } catch (e) {
+      throw new ApiError(e.message, e.status);
+    }
+  }
+
+  public async setForgotPassword(
+    password: string,
+    userId: Types.ObjectId,
+  ): Promise<void> {
+    try {
+      const hashPassword = await passwordService.hash(password);
+
+      await Promise.all([
+        User.findByIdAndUpdate(userId, { password: hashPassword }),
+
+        Action.deleteMany({
+          _user: userId,
+          actionType: EActionTokenType.Forgot,
+        }),
+      ]);
+    } catch (e) {
+      throw new ApiError(e.message, e.status);
+    }
+  }
+
+  public async activate(token: string, userId: Types.ObjectId): Promise<void> {
+    try {
+      const activateToken = tokenService.checkToken(
+        token,
+        EActionTokenType.Activate,
+      );
+
+      if (!activateToken) {
+        throw new ApiError('Token is not provided', 400);
+      }
+
+      await Promise.all([
+        User.findByIdAndUpdate(userId, { status: EStatus.active }),
+
+        Action.deleteMany({
+          _user: userId,
+          actionType: EActionTokenType.Activate,
+        }),
+      ]);
     } catch (e) {
       throw new ApiError(e.message, e.status);
     }

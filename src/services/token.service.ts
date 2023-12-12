@@ -20,6 +20,32 @@ class TokenService {
     };
   }
 
+  public async generateActionToken(
+    payload: ITokenPayload,
+    tokenType: EActionTokenType,
+  ): Promise<string> {
+    try {
+      let secret;
+      let expiresIn;
+
+      switch (tokenType) {
+        case EActionTokenType.Activate:
+          secret = configs.JWT_ACTIVATE_SECRET;
+          expiresIn = configs.JWT_ACTIVATE_EXPIRES_IN;
+
+          break;
+        case EActionTokenType.Forgot:
+          secret = configs.JWT_FORGOT_SECRET;
+          expiresIn = configs.JWT_FORGOT_EXPIRES_IN;
+          break;
+      }
+
+      return jwt.sign(payload, secret, { expiresIn });
+    } catch (e) {
+      throw new ApiError(e.message, e.status);
+    }
+  }
+
   public checkToken(
     token: string,
     tokenType: ETokenType | EActionTokenType,
@@ -44,7 +70,7 @@ class TokenService {
 
       return jwt.verify(token, secret) as ITokenPayload;
     } catch (e) {
-      throw new ApiError('Token not valid', 401);
+      throw new ApiError(e.message, e.status);
     }
   }
 }
