@@ -101,6 +101,14 @@
             "type": "string",
             "description": "authorization token",
             "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserForUpdate"
+            }
           }
         ],
         "responses": {
@@ -155,6 +163,65 @@
           },
           "404": {
             "description": "not found"
+          }
+        }
+      }
+    },
+    "/users/{userId}/photo": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "return user with photo",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "photo",
+            "in": "formData",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful add photo"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "users"
+        ],
+        "summary": "delete user photo",
+
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful delete photo"
           }
         }
       }
@@ -328,7 +395,9 @@
     },
     "/auth/password/forgot/{token}": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "summary": "save new password",
         "parameters": [
           {
