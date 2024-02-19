@@ -11,6 +11,8 @@ export const videoConfig = {
     'video/ogg',
     'video/mp2t',
     'video/webm',
+    'video/quicktime',
+    'application/octet-stream',
   ],
-  MAX_SIZE: 1080 * 1920,
+  MAX_SIZE: 40000000000,
 };

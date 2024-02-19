@@ -44,5 +44,18 @@ router.delete(
   commonMiddleware.isIdValid('userId'),
   userController.deletePhoto,
 );
+router.post(
+  '/:userId/video',
+  authMiddleware.checkAccessToken,
+  commonMiddleware.isIdValid('userId'),
+  fileMiddleware.isVideoValid,
+  userController.uploadVideo,
+);
+router.delete(
+  '/:userId/video',
+  authMiddleware.checkAccessToken,
+  commonMiddleware.isIdValid('userId'),
+  userController.deleteVideo,
+);
 
 export const userRouter = router;

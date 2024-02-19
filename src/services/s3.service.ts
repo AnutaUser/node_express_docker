@@ -7,6 +7,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { UploadedFile } from 'express-fileupload';
 import { Types } from 'mongoose';
+import { Readable } from 'stream';
 import { v4 } from 'uuid';
 
 import { configs } from '../configs';
@@ -40,6 +41,27 @@ class S3Service {
       }),
     );
     return pathToPhoto;
+  }
+
+  public async uploadFileStream(
+    file: UploadedFile,
+    stream: Readable,
+    itemType: EFileType,
+    itemId: Types.ObjectId | string,
+  ): Promise<string> {
+    const pathToVideo = this.passBuilder(file.name, itemType, itemId);
+
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: configs.AWS_S3_NAME,
+        Body: stream,
+        Key: pathToVideo,
+        ACL: 'public-read',
+        ContentType: file.mimetype,
+        ContentLength: file.size,
+      }),
+    );
+    return pathToVideo;
   }
 
   public async deletedFile(filePath: string): Promise<void> {

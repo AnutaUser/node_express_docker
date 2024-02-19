@@ -204,7 +204,6 @@
           "users"
         ],
         "summary": "delete user photo",
-
         "parameters": [
           {
             "name": "Authorization",
@@ -223,6 +222,60 @@
           "204": {
             "description": "successful delete photo"
           }
+        }
+      }
+    },
+    "/users/{userId}/video": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "return user with video",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "video",
+            "in": "formData",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "video upload successful"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["users"],
+        "summary": "delete video",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {"description": "no video"}
         }
       }
     },

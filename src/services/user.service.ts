@@ -1,4 +1,5 @@
 import { UploadedFile } from 'express-fileupload';
+import { createReadStream } from 'streamifier';
 
 import { EFileType } from '../enums';
 import { ApiError } from '../errors';
@@ -57,13 +58,51 @@ class UserService {
   public async deletePhoto(userId: string): Promise<IUser> {
     const user = await this.getOneByIdOrThrow(userId);
 
-    if (user.photo) {
-      await s3Service.deletedFile(user.photo);
+    if (!user.photo) {
+      return user;
     }
+    await s3Service.deletedFile(user.photo);
 
     return await User.findByIdAndUpdate(
       userId,
-      { $set: { photo: user.photo } },
+      { $unset: { photo: true } },
+      { new: true },
+    );
+  }
+
+  public async uploadVideo(
+    video: UploadedFile,
+    userId: string,
+  ): Promise<IUser> {
+    await this.getOneByIdOrThrow(userId);
+
+    const stream = createReadStream(video.data);
+
+    const pathToVideo = await s3Service.uploadFileStream(
+      video,
+      stream,
+      EFileType.userVideo,
+      userId,
+    );
+
+    return await User.findByIdAndUpdate(
+      userId,
+      { $set: { video: pathToVideo } },
+      { new: true },
+    );
+  }
+
+  public async deleteVideo(userId: string): Promise<IUser> {
+    const user = await this.getOneByIdOrThrow(userId);
+
+    if (!user.video) {
+      return user;
+    }
+    await s3Service.deletedFile(user.video);
+
+    return await User.findByIdAndUpdate(
+      userId,
+      { $unset: { video: true } },
       { new: true },
     );
   }
