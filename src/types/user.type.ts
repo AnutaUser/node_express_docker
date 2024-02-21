@@ -10,6 +10,8 @@ export interface IUser extends Document {
   status?: string;
   photo?: string;
   video?: string;
+  createdAt: NativeDate;
+  updatedAt: NativeDate;
 }
 
 export type IUserWithoutPass = Omit<IUser, 'password'>;
