@@ -2,6 +2,7 @@ import path from 'node:path';
 
 import {
   DeleteObjectCommand,
+  ObjectCannedACL,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
@@ -36,7 +37,7 @@ class S3Service {
         Bucket: configs.AWS_S3_NAME,
         Body: file.data,
         Key: pathToPhoto,
-        ACL: 'public-read',
+        ACL: configs.AWS_S3_ACL as ObjectCannedACL,
         ContentType: file.mimetype,
       }),
     );
@@ -56,7 +57,7 @@ class S3Service {
         Bucket: configs.AWS_S3_NAME,
         Body: stream,
         Key: pathToVideo,
-        ACL: 'public-read',
+        ACL: configs.AWS_S3_ACL as ObjectCannedACL,
         ContentType: file.mimetype,
         ContentLength: file.size,
       }),

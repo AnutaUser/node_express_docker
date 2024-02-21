@@ -1,12 +1,13 @@
 import { UploadedFile } from 'express-fileupload';
 import { createReadStream } from 'streamifier';
 
-import { EFileType } from '../enums';
+import { EFileType, ESmsActions } from '../enums';
 import { ApiError } from '../errors';
 import { User } from '../models';
 import { userRepository } from '../repositories';
 import { IUser } from '../types';
 import { s3Service } from './s3.service';
+import { smsService } from './sms.service';
 
 class UserService {
   public async findAll(): Promise<IUser[]> {
@@ -28,8 +29,12 @@ class UserService {
   }
 
   public async delete(userId: string): Promise<void> {
-    await this.getOneByIdOrThrow(userId);
-    await User.findByIdAndDelete(userId);
+    const user = await this.getOneByIdOrThrow(userId);
+
+    await Promise.all([
+      User.findByIdAndDelete(userId),
+      smsService.sendSMS(user.phone, ESmsActions.DELETE, user.username),
+    ]);
   }
 
   public async uploadPhoto(

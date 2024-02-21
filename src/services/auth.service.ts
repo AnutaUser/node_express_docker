@@ -1,17 +1,23 @@
 import { Types } from 'mongoose';
 
-import { EActionTokenType, EEmailActions, EStatus } from '../enums';
+import {
+  EActionTokenType,
+  EEmailActions,
+  ESmsActions,
+  EStatus,
+} from '../enums';
 import { ApiError } from '../errors';
 import { Action, OldPassword, Token, User } from '../models';
 import { ICredential, ITokenPair, ITokenPayload, IUser } from '../types';
 import { emailService } from './email.service';
 import { passwordService } from './password.service';
+import { smsService } from './sms.service';
 import { tokenService } from './token.service';
 
 class AuthService {
   public async register(body: IUser): Promise<void> {
     try {
-      const { password, email, username } = body;
+      const { password, email, username, phone } = body;
 
       const hashedPassword = await passwordService.hash(password);
 
@@ -33,6 +39,8 @@ class AuthService {
           username,
           activateToken,
         }),
+
+        smsService.sendSMS(phone, ESmsActions.REGISTER, username),
       ]);
     } catch (e) {
       throw new ApiError(e.message, e.status);
@@ -133,6 +141,7 @@ class AuthService {
     email: string,
     _id: string,
     username: string,
+    phone: string,
   ): Promise<void> {
     try {
       const forgotPasswordToken = await tokenService.generateActionToken(
@@ -151,6 +160,8 @@ class AuthService {
           forgotPasswordToken,
           username,
         }),
+
+        smsService.sendSMS(phone, ESmsActions.FORGOT_PASSWORD, username),
       ]);
     } catch (e) {
       throw new ApiError(e.message, e.status);

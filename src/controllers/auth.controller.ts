@@ -73,9 +73,9 @@ class AuthController {
   ): Promise<Response<void>> {
     try {
       const { email } = req.body;
-      const { _id, username } = req.res.locals.user;
+      const { _id, username, phone } = req.res.locals.user;
 
-      await authService.forgotPassword(email, _id, username);
+      await authService.forgotPassword(email, _id, username, phone);
 
       return res.sendStatus(200);
     } catch (e) {
