@@ -25,7 +25,7 @@
         "tags": [
           "users"
         ],
-        "summary": "return array of users",
+        "summary": "Return array of users",
         "description": "Get all users.",
         "responses": {
           "200": {
@@ -258,7 +258,9 @@
         }
       },
       "delete": {
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "summary": "delete video",
         "parameters": [
           {
@@ -275,7 +277,9 @@
           }
         ],
         "responses": {
-          "204": {"description": "no video"}
+          "204": {
+            "description": "no video"
+          }
         }
       }
     },
@@ -470,6 +474,254 @@
         "responses": {
           "200": {
             "description": "set new password"
+          }
+        }
+      }
+    },
+    "/cars": {
+      "get": {
+        "tags": [
+          "cars"
+        ],
+        "summary": "Return array of cars",
+        "description": "Get all cars",
+        "responses": {
+          "200": {
+            "description": "Get all cars",
+            "schema": {
+              "type": "array",
+              "$ref": "#/definitions/CarsWithPagination"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "cars"
+        ],
+        "description": "Create new car",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "description": "Access token",
+            "required": true
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CarForCreate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Create new car",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/CarForCreate"
+            }
+          },
+          "201": {
+            "description": "Created new car"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      }
+    },
+    "/cars/{carId}": {
+      "get": {
+        "tags": [
+          "cars"
+        ],
+        "description": "Get car by car id with creator",
+        "parameters": [
+          {
+            "name": "carId",
+            "in": "path",
+            "description": "Car ID",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access token",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "get by ID",
+            "schema": {
+              "$ref": "#/definitions/CarWithUser",
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "cars"
+        ],
+        "description": "Update car",
+        "parameters": [
+          {
+            "name": "carId",
+            "in": "path",
+            "description": "Car ID",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access token",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/CarForUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update car data",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/CarForUpdate"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "cars"
+        ],
+        "description": "Remove car",
+        "parameters": [
+          {
+            "name": "carId",
+            "in": "path",
+            "description": "Car ID",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access token",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "204": {
+            "description": "Deletion successful"
+          }
+        }
+      }
+    },
+    "/cars/{carId}/photo": {
+      "post": {
+        "tags": ["cars"],
+        "description": "Add car photo",
+        "parameters": [
+          {
+            "name": "carId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Car ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access token",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "photo",
+            "in": "formData",
+            "required": true,
+            "description": "Car photo",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Add user photo",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Car"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["cars"],
+        "description": "Remove car photo",
+        "parameters": [
+          {
+            "name": "carId",
+            "in": "path",
+            "description": "Car ID",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access token",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "204": {
+            "description": "Deletion successful"
           }
         }
       }
@@ -727,6 +979,282 @@
           "title": "Password",
           "type": "string",
           "pattern": "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%_*#?&])[A-Za-z\\d@$_!%*#?&]{8,20}$"
+        }
+      }
+    },
+    "CarsWithPagination": {
+      "required": [
+        "page",
+        "perPage",
+        "itemsCount",
+        "itemsFound",
+        "data"
+      ],
+      "type": "object",
+      "properties": {
+        "page": {
+          "title": "Current page",
+          "type": "integer",
+          "example": 1
+        },
+        "perPage": {
+          "title": "Quantity per page",
+          "type": "integer",
+          "example": 10
+        },
+        "itemsCount": {
+          "title": "Total count",
+          "type": "integer",
+          "example": 100
+        },
+        "itemsFound": {
+          "title": "Found items",
+          "type": "integer",
+          "example": 10
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Car"
+          }
+        }
+      }
+    },
+    "Car": {
+      "required": [
+        "brand",
+        "year",
+        "price"
+      ],
+      "type": "object",
+      "properties": {
+        "_id": {
+          "title": "id",
+          "type": "string",
+          "readOnly": true,
+          "example": "6482f9735a3aa0255467da91"
+        },
+        "brand": {
+          "title": "Car brand",
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 20,
+          "pattern": "^[a-zA-Zа-яА-я ёЁіІїЇ]{1,20}$",
+          "example": "BMW"
+        },
+        "year": {
+          "title": "Year",
+          "type": "number",
+          "minimum": 1990,
+          "maximum": 2024,
+          "example": "2015"
+        },
+        "price": {
+          "title": "Price",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000,
+          "example": "850000"
+        },
+        "description": {
+          "title": "About car",
+          "type": "string",
+          "maximum": 1000000,
+          "example": "Some information about this car"
+        },
+        "photo": {
+          "title": "Car photo",
+          "type": "string",
+          "format": "url"
+        },
+        "_user": {
+          "title": "Car seller",
+          "type": "string",
+          "readOnly": true,
+          "example": "9073f9730a3ab0255467da816"
+        },
+        "createdAt": {
+          "title": "Created",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "updatedAt": {
+          "title": "Updated",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        }
+      }
+    },
+    "CarWithUser": {
+      "required": [
+        "brand",
+        "price",
+        "year",
+        "_user"
+      ],
+      "type": "object",
+      "properties": {
+        "_id": {
+          "title": "id",
+          "type": "string",
+          "readOnly": true,
+          "example": "6482f9735a3aa0255467da91"
+        },
+        "brand": {
+          "title": "Car brand",
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 20,
+          "pattern": "^[a-zA-Zа-яА-я ёЁіІїЇ]{1,20}$",
+          "example": "BMW"
+        },
+        "year": {
+          "title": "Year",
+          "type": "number",
+          "minimum": 1990,
+          "maximum": 2024,
+          "example": "2015"
+        },
+        "price": {
+          "title": "Price",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000,
+          "example": "850000"
+        },
+        "description": {
+          "title": "About car",
+          "type": "string",
+          "maximum": 1000000,
+          "example": "Some information about this car"
+        },
+        "photo": {
+          "title": "Car photo",
+          "type": "string",
+          "format": "url"
+        },
+        "_user": {
+          "title": "Car seller",
+          "type": "string",
+          "readOnly": true,
+          "example": "9073f9730a3ab0255467da816"
+        },
+        "createdAt": {
+          "title": "Created",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "updatedAt": {
+          "title": "Updated",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        }
+      }
+    },
+    "CarForCreate": {
+      "required": [
+        "brand",
+        "price",
+        "year"
+      ],
+      "type": "object",
+      "properties": {
+        "_id": {
+          "title": "id",
+          "type": "string",
+          "readOnly": true,
+          "example": "6482f9730a3aa0255467da91"
+        },
+        "brand": {
+          "title": "Car brand",
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 20,
+          "pattern": "^[a-zA-Zа-яА-я ёЁіІїЇ]{1,20}$",
+          "example": "BMW"
+        },
+        "year": {
+          "title": "Year",
+          "type": "number",
+          "minimum": 1990,
+          "maximum": 2024,
+          "example": "2015"
+        },
+        "price": {
+          "title": "Price",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000,
+          "example": "850000"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string",
+          "maxLength": 1000000,
+          "example": "Some information about this car"
+        },
+        "photo": {
+          "title": "Photo",
+          "type": "string",
+          "format": "uri"
+        },
+        "_user": {
+          "title": "userId",
+          "type": "string",
+          "readOnly": true,
+          "example": "9073f9730a3ab0255467da816"
+        },
+        "createdAt": {
+          "title": "Created",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "updatedAt": {
+          "title": "Updated",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        }
+      }
+    },
+    "CarForUpdate": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "title": "Car brand",
+          "type": "string",
+          "pattern": "/^[a-zA-Zа-яА-я ёЁіІїЇ]{1,20}$/",
+          "example": "Audi"
+        },
+        "price": {
+          "title": "Car price",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000,
+          "example": "45 000"
+        },
+        "year": {
+          "title": "What year is the car from?",
+          "type": "number",
+          "minimum": 1990,
+          "maximum": 2023,
+          "example": "2017"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string",
+          "maxLength": 1000000,
+          "example": "Some information about this car"
+        },
+        "photo": {
+          "title": "Photo",
+          "type": "string",
+          "format": "uri"
         }
       }
     }

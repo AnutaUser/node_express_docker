@@ -1,8 +1,11 @@
+import { UploadedFile } from 'express-fileupload';
 import { Types } from 'mongoose';
 
+import { EFileType } from '../enums';
 import { ApiError } from '../errors';
 import { Car } from '../models';
 import { ICar } from '../types';
+import { s3Service } from './s3.service';
 
 class CarService {
   public async getAll(): Promise<ICar[]> {
@@ -42,6 +45,44 @@ class CarService {
   public async delete(carId: string): Promise<void> {
     try {
       return await Car.findByIdAndDelete(carId);
+    } catch (e) {
+      throw new ApiError(e.message, e.status);
+    }
+  }
+
+  public async uploadPhoto(
+    photo: UploadedFile,
+    carId: Types.ObjectId | string,
+  ): Promise<ICar> {
+    try {
+      const carPhoto = await s3Service.uploadFile(
+        photo,
+        EFileType.carPhoto,
+        carId,
+      );
+
+      return await Car.findByIdAndUpdate(
+        carId,
+        {
+          $set: { photo: carPhoto },
+        },
+        { returnDocument: 'after' },
+      );
+    } catch (e) {
+      throw new ApiError(e.message, e.status);
+    }
+  }
+
+  public async deletePhoto(carId: string, car: ICar): Promise<void> {
+    try {
+      await Promise.all([
+        s3Service.deletedFile(car.photo),
+        Car.findByIdAndUpdate(
+          carId,
+          { $unset: { photo: car.photo } },
+          { returnDocument: 'after' },
+        ),
+      ]);
     } catch (e) {
       throw new ApiError(e.message, e.status);
     }

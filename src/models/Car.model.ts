@@ -26,10 +26,6 @@ const carSchema = new Schema(
       type: String,
       require: false,
     },
-    video: {
-      type: String,
-      require: false,
-    },
     _user: {
       type: Types.ObjectId,
       required: true,

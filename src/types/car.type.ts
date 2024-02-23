@@ -8,7 +8,6 @@ export interface ICar extends Document {
   price?: number;
   description?: string;
   photo?: string;
-  video?: string;
   _user?: Types.ObjectId | IUser | any;
   createdAt: NativeDate;
   updatedAt: NativeDate;
