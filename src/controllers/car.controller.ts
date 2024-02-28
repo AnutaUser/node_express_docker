@@ -4,7 +4,7 @@ import { UploadedFile } from 'express-fileupload';
 import { ApiError } from '../errors';
 import { carMapper } from '../mappers';
 import { carService } from '../services';
-import { ICar, ITokenPayload } from '../types';
+import { ICar, IQuery, ITokenPayload } from '../types';
 
 class CarController {
   public async getAll(
@@ -13,13 +13,16 @@ class CarController {
     next: NextFunction,
   ): Promise<Response<ICar[]>> {
     try {
-      const cars = await carService.getAll();
+      const response = await carService.getAll(req.query as unknown as IQuery);
 
-      const carsForResponse = cars.map((car) => {
+      const cars = response.data.map((car) => {
         return carMapper.carForResponse(car);
       });
 
-      return res.status(200).json(carsForResponse);
+      return res.status(200).json({
+        ...response,
+        data: cars,
+      });
     } catch (e) {
       next(new ApiError(e.message, e.status));
     }

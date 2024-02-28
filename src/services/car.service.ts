@@ -4,13 +4,14 @@ import { Types } from 'mongoose';
 import { EFileType } from '../enums';
 import { ApiError } from '../errors';
 import { Car } from '../models';
-import { ICar } from '../types';
+import { carRepository } from '../repositories';
+import { ICar, IPaginationResponse, IQuery } from '../types';
 import { s3Service } from './s3.service';
 
 class CarService {
-  public async getAll(): Promise<ICar[]> {
+  public async getAll(query: IQuery): Promise<IPaginationResponse<ICar>> {
     try {
-      return await Car.find();
+      return await carRepository.getAll(query);
     } catch (e) {
       throw new ApiError(e.message, e.status);
     }

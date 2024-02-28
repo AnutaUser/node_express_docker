@@ -5,14 +5,14 @@ import { EFileType, ESmsActions } from '../enums';
 import { ApiError } from '../errors';
 import { User } from '../models';
 import { userRepository } from '../repositories';
-import { IUser } from '../types';
+import { IPaginationResponse, IQuery, IUser } from '../types';
 import { s3Service } from './s3.service';
 import { smsService } from './sms.service';
 
 class UserService {
-  public async findAll(): Promise<IUser[]> {
+  public async findAll(query: IQuery): Promise<IPaginationResponse<IUser>> {
     try {
-      return await User.find();
+      return await userRepository.getAll(query);
     } catch (e) {
       throw new ApiError(e.message, e.status);
     }

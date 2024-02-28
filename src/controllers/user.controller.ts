@@ -5,18 +5,27 @@ import multer from 'multer';
 import { ApiError } from '../errors';
 import { userMapper } from '../mappers';
 import { userService } from '../services';
-import { IUser } from '../types';
+import { IQuery, IUser } from '../types';
 
 class UserController {
   public async findAll(
-    _req: Request,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<Response<IUser[]>> {
     try {
-      const users = await userService.findAll();
+      const response = await userService.findAll(
+        req.query as unknown as IQuery,
+      );
 
-      return res.status(200).json(users);
+      const users = response.data.map((user) =>
+        userMapper.userForResponse(user),
+      );
+
+      return res.status(200).json({
+        ...response,
+        data: users,
+      });
     } catch (e) {
       next(new ApiError(e.message, e.status));
     }
