@@ -13,7 +13,7 @@ class UserRepository {
 
       const {
         page = 1,
-        limit = 5,
+        limit = 10,
         sortedBy = 'createdBy',
         ...searchObj
       } = queryObj;

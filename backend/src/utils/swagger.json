@@ -31,8 +31,8 @@
           "200": {
             "description": "Get all users",
             "schema": {
-              "type": "array",
-              "$ref": "#/definitions/User"
+              "type": "object",
+              "$ref": "#/definitions/UsersWithPagination"
             }
           },
           "400": {
@@ -809,6 +809,44 @@
           "type": "string",
           "format": "date-time",
           "readOnly": true
+        }
+      }
+    },
+    "UsersWithPagination": {
+      "required": [
+        "page",
+        "perPage",
+        "itemsCount",
+        "itemsFound",
+        "data"
+      ],
+      "type": "object",
+      "properties": {
+        "page": {
+          "title": "Current page",
+          "type": "integer",
+          "example": 1
+        },
+        "perPage": {
+          "title": "Quantity per page",
+          "type": "integer",
+          "example": 10
+        },
+        "itemsCount": {
+          "title": "Total count",
+          "type": "integer",
+          "example": 100
+        },
+        "itemsFound": {
+          "title": "Found items",
+          "type": "integer",
+          "example": 10
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
         }
       }
     },

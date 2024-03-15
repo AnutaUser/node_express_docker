@@ -7,7 +7,7 @@ import { configs } from './configs';
 import { cronRunner } from './crons';
 import { ApiError } from './errors';
 import { authRouter, carRouter, userRouter } from './routers';
-import { corsUtil, limiterUtil } from './utils';
+import { limiterUtil } from './utils';
 import swaggerJson from './utils/swagger.json';
 
 const app = express();
@@ -16,7 +16,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(limiterUtil);
-app.use(corsUtil);
 
 app.use(fileUpload());
 
@@ -32,9 +31,36 @@ app.use((err: ApiError, _req: Request, res: Response, _next: NextFunction) => {
     status: err.status,
   });
 });
-app.listen(configs.PORT, async () => {
-  await cronRunner();
-  await mongoose.connect(configs.DB_URL);
-  // eslint-disable-next-line no-console
-  console.log(`work on port: ${configs.PORT} 😎️`);
-});
+
+const dbConnection = async () => {
+  let dbCon = false;
+
+  while (!dbCon) {
+    try {
+      // eslint-disable-next-line no-console
+      console.log('Connection to database');
+      await mongoose.connect(configs.DB_URL);
+      dbCon = true;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Database unavailable, wait 3 seconds');
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
+  }
+};
+
+const start = async () => {
+  try {
+    await dbConnection();
+    await app.listen(configs.PORT, () => {
+      cronRunner();
+      // eslint-disable-next-line no-console
+      console.log(`Work on port: ${configs.PORT} 😎️`);
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+  }
+};
+
+start();
