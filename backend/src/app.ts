@@ -32,13 +32,13 @@ app.use((err: ApiError, _req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-const dbConnection = async () => {
+const dbConnect = async () => {
   let dbCon = false;
 
   while (!dbCon) {
     try {
       // eslint-disable-next-line no-console
-      console.log('Connection to database');
+      console.log('Connecting to database', configs.DB_URL);
       await mongoose.connect(configs.DB_URL);
       dbCon = true;
     } catch (e) {
@@ -51,7 +51,7 @@ const dbConnection = async () => {
 
 const start = async () => {
   try {
-    await dbConnection();
+    await dbConnect();
     await app.listen(configs.PORT, () => {
       cronRunner();
       // eslint-disable-next-line no-console

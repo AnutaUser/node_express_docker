@@ -12,7 +12,6 @@ class AuthController {
   ): Promise<Response<void>> {
     try {
       await authService.register(req.body);
-
       return res.sendStatus(201);
     } catch (e) {
       next(new ApiError(e.message, e.status));

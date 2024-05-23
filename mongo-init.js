@@ -5,7 +5,7 @@ db.createUser(
         roles: [
             {
                 role: 'readWrite',
-                db: 'db_nodejs_express'
+                db: 'node_express_ts'
             }
         ]
     }

@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 import hbs from 'nodemailer-express-handlebars';
 
 import { configs } from '../configs';
-import { emailConstant } from '../constants/email.constant';
+import { emailConstant } from '../constants';
 import { EEmailActions } from '../enums';
 
 class EmailService {

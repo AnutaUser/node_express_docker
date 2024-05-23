@@ -6,8 +6,8 @@ services:
       context: .
     env_file:
       - .env
-    ports:
-      - "4000:$PORT"
+#    ports:
+#      - "4000:$PORT"
     volumes:
       - ./dist:/app
       - /app/node_modules
@@ -18,11 +18,11 @@ services:
     image: mongo
     env_file:
       - .env
-    ports:
-      - "27018:27017"
+#    ports:
+#      - "27018:27017"
     volumes:
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
-      - ./mongodb:/data/db
+      - ./mongo_db:/data/db
     restart: on-failure
 
   web:
